@@ -13,7 +13,7 @@ export const login = async(req,res) =>{
         const user = await User.findOne({email});
         let curr = new Date();
         let totalAttempts = 5, banHours=24;
-        let sendToken = () => {
+        let sendToken = async() => {
             let token = jwt.sign({_id:user._id, email: user.email},process.env.JWT_SECRET);
             // console.log(token);
             user.attempts = 0;
@@ -31,7 +31,7 @@ export const login = async(req,res) =>{
             }else if(Math.floor(timeLeft)===0 && timeLeft>0){
                 return res.status(200).send({message:`Your ban ends after ${(timeLeft*60).toFixed(0)}minutes`, data:user, status:"warning"});
             }
-            sendToken();
+            await sendToken();
         }
         else{
             const isMatch = await bcrypt.compare(password,user.password);
@@ -47,7 +47,7 @@ export const login = async(req,res) =>{
                 await user.save();
                 return res.status(200).send({message:`Incorrect Password! ${totalAttempts-user.attempts} attempts left`, data:user, status:"warning"});
             }
-            sendToken();
+            await sendToken();
         }
         
         
