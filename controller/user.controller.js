@@ -18,6 +18,7 @@ export const login = async(req,res) =>{
             // console.log(token);
             user.attempts = 0;
             user.blockedTill = null;
+            await user.save();
             return res.status(200).send({token:`Bearer ${token}`, message: "Login Successful!", status:"success"});
         }
         if(!user){
